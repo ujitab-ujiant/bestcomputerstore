@@ -69,6 +69,11 @@ Universitas Pamulang
 - Laporan penjualan *(pengembangan)*
 
 ---
+## Login Akun
+Jalankan command diterminal:
+php artisan migrate --seed
+
+lalu cek user login admin dan teknisi di database/seeder/UserSeeder.php
 
 ---
 ## License
