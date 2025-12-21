@@ -27,6 +27,7 @@ Project ini digunakan sebagai media pembelajaran dalam
 menerapkan konsep pengembangan sistem informasi berbasis web
 menggunakan framework Laravel.
 
+Keaslian Project ini dapat dibuktikan dengan Laporan Kerja Praktik yang telah dibuat sebelumnya jika diminta
 ---
 
 ## 👨‍💻 Developer & Kontribusi
