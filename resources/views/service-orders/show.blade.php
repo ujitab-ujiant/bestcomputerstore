@@ -5,7 +5,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3">Detail Service Order: {{ $serviceOrder->service_code }}</h1>
         <div>
-            <a href="{{ route('service-orders.edit', $serviceOrder->id) }}" class="btn btn-warning">
+            <button onclick="window.print()" class="btn btn-outline-dark me-1">
+                <i class="fas fa-print me-1"></i> Cetak Nota
+            </button>
+            <a href="{{ route('service-orders.edit', $serviceOrder->id) }}" class="btn btn-warning me-1">
                 <i class="fas fa-edit"></i> Edit
             </a>
             <a href="{{ route('service-orders.index') }}" class="btn btn-secondary">
@@ -27,7 +30,18 @@
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-4 fw-bold">Customer:</div>
-                        <div class="col-md-8">{{ $serviceOrder->customer_name }}</div>
+                        <div class="col-md-8">
+                            <span class="fw-bold">{{ $serviceOrder->customer_name }}</span>
+                            @if($serviceOrder->customer_phone)
+                                @php $phoneNorm = \App\Models\Customer::normalizePhone($serviceOrder->customer_phone); @endphp
+                                <div class="mt-1 d-flex align-items-center gap-2">
+                                    <span class="font-monospace text-muted small">{{ $serviceOrder->customer_phone }}</span>
+                                    <a href="https://wa.me/{{ $phoneNorm }}?text={{ rawurlencode('Halo ' . $serviceOrder->customer_name . ', update perihal tiket servis #' . $serviceOrder->service_code . ' di Best Computer.') }}" target="_blank" class="btn btn-sm btn-success py-0 px-2">
+                                        <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-4 fw-bold">Nama Laptop:</div>
@@ -68,6 +82,33 @@
                     <div class="row mb-3">
                         <div class="col-md-4 fw-bold">Teknisi:</div>
                         <div class="col-md-8">{{ $serviceOrder->technician ? $serviceOrder->technician->name : 'Belum ditugaskan' }}</div>
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Garansi Servis:</div>
+                        <div class="col-md-8">
+                            @if($serviceOrder->warranty_duration_days > 0)
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <strong>{{ $serviceOrder->warranty_duration_days }} Hari</strong>
+                                    @if($serviceOrder->status === 'completed')
+                                        @if($serviceOrder->is_under_warranty)
+                                            <span class="badge bg-success">Aktif s/d {{ $serviceOrder->warranty_expires_at ? $serviceOrder->warranty_expires_at->format('d M Y') : '-' }}</span>
+                                        @else
+                                            <span class="badge bg-secondary">Garansi Berakhir</span>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-light text-muted border">Aktif setelah Completed</span>
+                                    @endif
+                                </div>
+                                @if($serviceOrder->warranty_note)
+                                    <small class="text-muted d-block bg-light p-2 rounded border mt-1">
+                                        {{ $serviceOrder->warranty_note }}
+                                    </small>
+                                @endif
+                            @else
+                                <span class="text-muted">Tanpa Garansi</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

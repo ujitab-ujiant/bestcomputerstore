@@ -11,21 +11,30 @@
     }
 
     .scroll-to-top {
-        width: 46px;
-        height: 46px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         border: none;
         cursor: pointer;
-        background-color: #2563eb; 
+        background-color: #16a34a; 
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
-        transition: background-color 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .scroll-to-top.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
     }
 
     .scroll-to-top:hover {
-        background-color: #1d4ed8; 
+        background-color: #15803d; 
     }
 
     .scroll-to-top svg {
@@ -69,4 +78,17 @@
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.querySelector('.scroll-to-top');
+        if (btn) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 250) {
+                    btn.classList.add('show');
+                } else {
+                    btn.classList.remove('show');
+                }
+            });
+        }
+    });
 </script>

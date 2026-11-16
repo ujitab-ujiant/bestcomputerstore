@@ -241,11 +241,66 @@
             </div>
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+            @if(isset($recentOrders) && count($recentOrders) > 0)
+            {{-- 1. Mobile View: Detail Cards --}}
+            <div class="d-block d-md-none p-3 bg-light rounded-4">
+                @foreach($recentOrders as $order)
+                    <article class="card border-0 shadow-sm rounded-4 mb-3 bg-white overflow-hidden">
+                        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="badge bg-light text-success border font-monospace fw-bold">{{ $order->service_code }}</span>
+                                <small class="text-muted ms-2" style="font-size: 0.7rem;"><i class="far fa-calendar-alt me-1"></i>{{ $order->created_at->format('d M Y') }}</small>
+                            </div>
+                            <div>
+                                @if($order->status == 'pending')
+                                    <span class="badge bg-primary rounded-pill">Pending</span>
+                                @elseif($order->status == 'process')
+                                    <span class="badge bg-warning text-dark rounded-pill">Process</span>
+                                @elseif($order->status == 'completed')
+                                    <span class="badge bg-success rounded-pill">Completed</span>
+                                @else
+                                    <span class="badge bg-danger rounded-pill">Cancelled</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-0">{{ $order->customer_name }}</h6>
+                                    <div class="d-flex align-items-center gap-1 text-muted small mt-0.5">
+                                        <i class="fas fa-laptop text-success"></i>
+                                        <span>{{ $order->laptop_name }}</span>
+                                        <span class="badge bg-light text-secondary border ms-1" style="font-size: 0.65rem;">{{ $order->laptop_type }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @if(Auth::user()->role === 'admin')
+                            <div class="small text-muted mb-2.5 pb-2 border-bottom">
+                                <i class="fas fa-user-cog me-1 text-secondary"></i>
+                                <span>Teknisi: <strong>{{ $order->technician_name ?? 'Belum ditugaskan' }}</strong></span>
+                            </div>
+                            @endif
+                            <div class="d-flex gap-2 pt-1">
+                                <a href="{{ route('service-orders.show', $order->id) }}" class="btn btn-sm btn-info text-white rounded-3 flex-fill text-center fw-semibold py-1.5">
+                                    <i class="fas fa-eye me-1"></i> Detail
+                                </a>
+                                @if(Auth::user()->role === 'admin' || $order->technician_id === Auth::id())
+                                    <a href="{{ route('service-orders.edit', $order->id) }}" class="btn btn-sm btn-warning text-white rounded-3 px-3 py-1.5 fw-semibold" title="Edit">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            {{-- 2. Desktop View: Table --}}
+            <div class="d-none d-md-block table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>Service Code</th>
+                            <th class="ps-3 py-3">Service Code</th>
                             <th>Customer</th>
                             <th>Laptop</th>
                             @if(Auth::user()->role === 'admin')
@@ -253,16 +308,16 @@
                             @endif
                             <th>Status</th>
                             <th>Created</th>
-                            <th>Actions</th>
+                            <th class="text-end pe-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($recentOrders as $order)
                         <tr>
-                            <td>
-                                <strong class="text-primary">{{ $order->service_code }}</strong>
+                            <td class="ps-3">
+                                <strong class="text-success font-monospace">{{ $order->service_code }}</strong>
                             </td>
-                            <td>{{ $order->customer_name }}</td>
+                            <td class="fw-bold text-dark">{{ $order->customer_name }}</td>
                             <td>
                                 <div>
                                     <strong>{{ $order->laptop_name }}</strong>
@@ -271,24 +326,24 @@
                             </td>
                             @if(Auth::user()->role === 'admin')
                             <td>
-                                <span class="badge bg-secondary">
+                                <span class="badge bg-secondary-subtle text-dark border">
                                     {{ $order->technician_name ?? 'Belum ditugaskan' }}
                                 </span>
                             </td>
                             @endif
                             <td>
                                 @if($order->status == 'pending')
-                                    <span class="badge bg-primary">Pending</span>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill fw-semibold">Pending</span>
                                 @elseif($order->status == 'process')
-                                    <span class="badge bg-warning">Process</span>
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2.5 py-1 rounded-pill fw-semibold">Process</span>
                                 @elseif($order->status == 'completed')
-                                    <span class="badge bg-success">Completed</span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill fw-semibold">Completed</span>
                                 @else
-                                    <span class="badge bg-danger">Cancelled</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill fw-semibold">Cancelled</span>
                                 @endif
                             </td>
-                            <td>{{ $order->created_at->format('d M Y H:i') }}</td>
-                            <td>
+                            <td class="small text-muted">{{ $order->created_at->format('d M Y H:i') }}</td>
+                            <td class="text-end pe-3">
                                 <div class="btn-group" role="group">
                                     <a href="{{ route('service-orders.show', $order->id) }}" class="btn btn-sm btn-info text-white">
                                         <i class="fas fa-eye"></i>
@@ -303,20 +358,20 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="{{ Auth::user()->role === 'admin' ? '7' : '6' }}" class="text-center py-4">
-                                <i class="fas fa-inbox text-muted mb-2" style="font-size: 2rem;"></i>
-                                <br>
-                                @if(Auth::user()->role === 'admin')
-                                    No service orders yet
-                                @else
-                                    Belum ada tugas yang ditugaskan
-                                @endif
+                            <td colspan="{{ Auth::user()->role === 'admin' ? '7' : '6' }}" class="text-center py-4 text-muted">
+                                Belum ada service order
                             </td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+            @else
+            <div class="text-center py-5 text-muted">
+                <i class="fas fa-inbox mb-2" style="font-size: 2.5rem; opacity: 0.4;"></i>
+                <p class="mb-0">Belum ada service order terbaru</p>
+            </div>
+            @endif
         </div>
         <div class="card-footer bg-light py-3">
             <div class="d-flex justify-content-between align-items-center">

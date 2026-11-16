@@ -122,7 +122,41 @@ class ServiceOrderController extends Controller
             'price' => $price,
             'service_note' => $request->service_note,
             'technician_id' => $technicianId,
+            'warranty_duration_days' => $request->warranty_duration_days,
+            'warranty_note' => $request->warranty_note,
         ]);
+
+        // Normalize phone and find/create pelanggan user
+        if ($request->filled('customer_phone')) {
+            $normalized = preg_replace('/[^0-9]/', '', $request->customer_phone);
+            if (str_starts_with($normalized, '0')) {
+                $normalized = '62' . substr($normalized, 1);
+            } elseif (str_starts_with($normalized, '8')) {
+                $normalized = '62' . $normalized;
+            }
+            // starts with 62 → keep as is
+
+            $pelanggan = \App\Models\User::where('phone', $normalized)->where('role', 'pelanggan')->first();
+            if (!$pelanggan) {
+                $password = substr($normalized, -4);
+                $pelanggan = \App\Models\User::create([
+                    'name' => $request->customer_name,
+                    'email' => $normalized . '@bestcomputer.local',
+                    'phone' => $normalized,
+                    'password' => \Illuminate\Support\Facades\Hash::make($password),
+                    'role' => 'pelanggan',
+                ]);
+            }
+            $serviceOrder->update(['user_id' => $pelanggan->id, 'customer_phone' => $normalized]);
+        }
+
+        // Notify assigned technician
+        if ($technicianId) {
+            $technician = \App\Models\User::find($technicianId);
+            if ($technician) {
+                $technician->notify(new \App\Notifications\OrderAssigned($serviceOrder));
+            }
+        }
 
         return redirect()->route('service-orders.index')
             ->with('success', 'Service order created successfully with code: ' . $serviceCode);
@@ -198,20 +232,135 @@ class ServiceOrderController extends Controller
             }
         }
 
+        // Normalize phone and find/create pelanggan user on update
+        $userId = $serviceOrder->user_id;
+        $normalizedPhone = $serviceOrder->customer_phone;
+        if ($request->filled('customer_phone')) {
+            $normalized = preg_replace('/[^0-9]/', '', $request->customer_phone);
+            if (str_starts_with($normalized, '0')) {
+                $normalized = '62' . substr($normalized, 1);
+            } elseif (str_starts_with($normalized, '8')) {
+                $normalized = '62' . $normalized;
+            }
+            $normalizedPhone = $normalized;
+
+            $pelanggan = \App\Models\User::where('phone', $normalized)->where('role', 'pelanggan')->first();
+            if (!$pelanggan) {
+                $password = substr($normalized, -4);
+                $pelanggan = \App\Models\User::create([
+                    'name' => $request->customer_name,
+                    'email' => $normalized . '@bestcomputer.local',
+                    'phone' => $normalized,
+                    'password' => \Illuminate\Support\Facades\Hash::make($password),
+                    'role' => 'pelanggan',
+                ]);
+            }
+            $userId = $pelanggan->id;
+        }
+
+        $newStatus = $request->status;
+        $oldStatus = $serviceOrder->status;
+
+        // Set warranty_start_date when transitioning to completed
+        $warrantyStartDate = $serviceOrder->warranty_start_date;
+        $warrantyDays = $request->warranty_duration_days ?? $serviceOrder->warranty_duration_days;
+        if ($newStatus === 'completed' && $oldStatus !== 'completed' && $warrantyDays > 0 && !$warrantyStartDate) {
+            $warrantyStartDate = now()->toDateString();
+        }
+
         $serviceOrder->update([
             'customer_id' => $customer->id ?? null,
             'customer_name' => $request->customer_name,
             'laptop_name' => $request->laptop_name,
             'laptop_type' => $request->laptop_type,
             'problem_description' => $request->problem_description,
-            'status' => $request->status,
+            'status' => $newStatus,
             'price' => $price,
             'service_note' => $request->service_note,
             'technician_id' => $request->technician_id ?? $serviceOrder->technician_id,
+            'warranty_duration_days' => $warrantyDays,
+            'warranty_note' => $request->warranty_note ?? $serviceOrder->warranty_note,
+            'warranty_start_date' => $warrantyStartDate,
+            'user_id' => $userId,
+            'customer_phone' => $normalizedPhone,
         ]);
+
+        $serviceOrder->refresh();
+
+        // Notify pelanggan on status change
+        if ($userId && $newStatus !== $oldStatus) {
+            $pelangganUser = \App\Models\User::find($userId);
+            if ($pelangganUser) {
+                $pelangganUser->notify(new \App\Notifications\ServiceStatusUpdated($serviceOrder));
+            }
+        }
+
+        // Notify admin when completed
+        if ($newStatus === 'completed' && $oldStatus !== 'completed') {
+            $technicianName = optional($serviceOrder->technician)->name ?? 'Teknisi';
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\ServiceStatusUpdated($serviceOrder));
+            }
+        }
 
         return redirect()->route('service-orders.index')
             ->with('success', 'Service order updated successfully!');
+    }
+
+    /**
+     * Quick status update (staff only)
+     */
+    public function updateStatus(Request $request, ServiceOrder $serviceOrder)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,process,completed,cancelled',
+        ]);
+
+        $validTransitions = [
+            'pending'   => ['process', 'cancelled'],
+            'process'   => ['completed', 'cancelled', 'pending'],
+            'completed' => ['process', 'cancelled'],
+            'cancelled' => ['pending'],
+        ];
+
+        $newStatus = $request->status;
+        $oldStatus = $serviceOrder->status;
+        $allowed = $validTransitions[$oldStatus] ?? [];
+
+        if (!in_array($newStatus, $allowed)) {
+            return redirect()->back()->with('error', "Transisi status dari {$oldStatus} ke {$newStatus} tidak diizinkan.");
+        }
+
+        $warrantyStartDate = $serviceOrder->warranty_start_date;
+        if ($newStatus === 'completed' && $serviceOrder->warranty_duration_days > 0 && !$warrantyStartDate) {
+            $warrantyStartDate = now()->toDateString();
+        }
+
+        $serviceOrder->update([
+            'status' => $newStatus,
+            'warranty_start_date' => $warrantyStartDate,
+        ]);
+
+        $serviceOrder->refresh();
+
+        // Notify pelanggan
+        if ($serviceOrder->user_id) {
+            $pelanggan = \App\Models\User::find($serviceOrder->user_id);
+            if ($pelanggan) {
+                $pelanggan->notify(new \App\Notifications\ServiceStatusUpdated($serviceOrder));
+            }
+        }
+
+        // Notify admin when completed
+        if ($newStatus === 'completed') {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\ServiceStatusUpdated($serviceOrder));
+            }
+        }
+
+        return redirect()->back()->with('success', "Status service order #{$serviceOrder->service_code} berhasil diubah menjadi {$newStatus}.");
     }
 
     /**

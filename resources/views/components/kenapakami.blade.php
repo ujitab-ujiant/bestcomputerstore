@@ -1,10 +1,11 @@
-<div id="whyUs" class="w-[86%] max-w-7xl mx-auto bg-white rounded-lg shadow-lg py-12 px-6 transition-all duration-500">
-    <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900">Mengapa <span class="text-green-600">BEST COMPUTER</span> ?</h2>
-        <p class="mt-2 text-lg text-gray-600">
-            <span class="font-semibold text-green-600">BEST COMPUTER</span> selalu menyediakan Layanan & Solusi Terbaik untuk Laptop & PC Anda!
-        </p>
-    </div>
+<div id="whyUs" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-4">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 py-12 px-6 sm:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Mengapa <span class="text-green-600">BEST COMPUTER</span> ?</h2>
+            <p class="mt-2 text-sm sm:text-base text-gray-600">
+                <span class="font-semibold text-green-600">BEST COMPUTER</span> selalu menyediakan Layanan & Solusi Terbaik untuk Laptop & PC Anda!
+            </p>
+        </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         <div class="bg-white rounded-lg p-6 text-center border border-gray-100 shadow-sm transform transition-transform duration-300 hover:-translate-y-1">
@@ -65,30 +66,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .why-us-container {
-        width: 86%;
-        max-width: 1400px;
-        margin: 0 auto;
-        transition: all 0.5s ease;
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const whyUsContainer = document.getElementById('whyUs');
-
-        window.addEventListener('scroll', function() {
-            if (whyUsContainer) {
-                if (window.scrollY > (whyUsContainer.offsetTop - 100)) {
-                    whyUsContainer.classList.remove('why-us-container');
-                    whyUsContainer.classList.add('max-w-7xl', 'mx-auto');
-                } else {
-                    whyUsContainer.classList.add('why-us-container');
-                    whyUsContainer.classList.remove('max-w-7xl', 'mx-auto');
-                }
-            }
-        });
-    });
-</script>

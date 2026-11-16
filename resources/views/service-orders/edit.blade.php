@@ -30,8 +30,9 @@
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="customer_phone" class="form-label">Nomor Telepon</label>
-                        <input type="text" class="form-control @error('customer_phone') is-invalid @enderror" id="customer_phone" name="customer_phone" value="{{ old('customer_phone', $serviceOrder->customer->phone ?? '') }}">
+                        <label for="customer_phone" class="form-label">Nomor Telepon / WhatsApp</label>
+                        <input type="text" class="form-control @error('customer_phone') is-invalid @enderror" id="customer_phone" name="customer_phone" value="{{ old('customer_phone', $serviceOrder->customer_phone ?? ($serviceOrder->customer->phone ?? '')) }}" placeholder="08123456789">
+                        <small class="text-muted">Nomor ini terhubung ke akun portal login pelanggan.</small>
                         @error('customer_phone')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -125,8 +126,29 @@
                     </div>
                     @endif
                     
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Update Service Order</button>
+                    <div class="col-12 mb-3 mt-2">
+                        <h5>Kesepakatan Garansi Servis</h5>
+                        <hr>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="warranty_duration_days" class="form-label">Durasi Garansi (Hari)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control @error('warranty_duration_days') is-invalid @enderror" id="warranty_duration_days" name="warranty_duration_days" value="{{ old('warranty_duration_days', $serviceOrder->warranty_duration_days ?? 30) }}" min="0">
+                            <span class="input-group-text">Hari</span>
+                        </div>
+                        <small class="text-muted">Masa garansi aktif saat status "Completed".</small>
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label for="warranty_note" class="form-label">Ketentuan Garansi</label>
+                        <input type="text" class="form-control" id="warranty_note" name="warranty_note" value="{{ old('warranty_note', $serviceOrder->warranty_note) }}" placeholder="Catatan kesepakatan garansi">
+                    </div>
+                    
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">
+                            <i class="fas fa-save me-1"></i> Update Service Order
+                        </button>
                     </div>
                 </div>
             </form>

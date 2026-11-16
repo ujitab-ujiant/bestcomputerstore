@@ -4,28 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best Komputer - PC Parts & Peripheral</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/pcperipheral.css'])
     
 </head>
-<body class="font-sans antialiased bg-white">
+<body class="font-sans antialiased bg-gray-50">
     <x-navbar></x-navbar>
-    <div class="hero-section flex items-center relative" style="background-image: url('{{ asset('img/bgpcperipheral.jpg') }}'); background-size: cover; background-position: center; min-height: 800px; padding-bottom: 160px;">
+    <div class="hero-section flex items-center relative pt-28 pb-20 md:pt-36 md:pb-32" style="background-image: url('{{ asset('img/bgpcperipheral.jpg') }}'); background-size: cover; background-position: center; min-height: 520px;">
         <div class="hero-content w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">Temukan Berbagai Part PC & Peripheral Berkualitas!</h1>
-                <p class="text-xl text-white mb-8">Upgrade dan lengkapi kebutuhan komputermu dengan produk terbaik!</p>
-                <a href="#part-pc" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-md transition duration-300">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Temukan Berbagai Part PC & Peripheral Berkualitas!</h1>
+                <p class="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto">Upgrade dan lengkapi kebutuhan komputermu dengan produk terbaik!</p>
+                <a href="#part-pc" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg transition duration-300">
                     Lihat Katalog
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="py-16 bg-transparent relative" style="margin-top: -200px; z-index: 10;">
-        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto bg-white rounded-lg shadow-lg p-8 relative z-10" style="margin-bottom: -40px;">
+    <div class="relative z-20 -mt-10 md:-mt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div>
+            <div class="mx-auto bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8 md:p-10 relative z-10">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold">
                         Temukan apapun yang <span class="text-blue-500">Kamu Butuhkan</span>

@@ -30,7 +30,7 @@
                     <span class="input-icon">
                         <i class="fas fa-user"></i>
                     </span>
-                    <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="Username" required>
+                    <input type="text" name="email" id="email" value="{{ old('email') }}" placeholder="Email atau No. Telepon" required autofocus>
                 </div>
                 <div class="input-group">
                     <span class="input-icon">
@@ -40,6 +40,9 @@
                     <span class="password-toggle" onclick="togglePassword()">
                         <i class="fas fa-eye" id="toggleIcon"></i>
                     </span>
+                </div>
+                <div style="font-size: 11px; color: #64748b; margin-top: -10px; margin-bottom: 12px; line-height: 1.4;">
+                    <i class="fas fa-info-circle text-success me-1"></i> Pelanggan dapat login menggunakan No. Telepon saat servis (Password: 4 digit terakhir no. HP).
                 </div>
                 <div class="remember-me">
                     <input type="checkbox" name="remember" id="remember">

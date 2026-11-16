@@ -24,8 +24,8 @@ return new class extends Migration
         });
         
         Schema::table('products', function (Blueprint $table) {
-            $table->integer('created_by')->nullable()->change();
-            $table->integer('updated_by')->nullable()->change();
+            $table->unsignedBigInteger('created_by')->nullable()->change();
+            $table->unsignedBigInteger('updated_by')->nullable()->change();
         });
         
         Schema::table('products', function (Blueprint $table) {

@@ -5,27 +5,53 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeSidebar() {
     const mobileToggle = document.querySelector('.mobile-toggle');
     const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    let backdrop = document.querySelector('.sidebar-backdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'sidebar-backdrop';
+        document.body.appendChild(backdrop);
+    }
+
+    function openSidebar() {
+        sidebar.classList.add('active');
+        backdrop.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('active');
+        backdrop.classList.remove('show');
+        document.body.style.overflow = '';
+    }
     
     if (mobileToggle) {
-        mobileToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('active');
+        mobileToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (sidebar.classList.contains('active')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
         });
     }
 
-    document.addEventListener('click', function(event) {
-        const toggleButton = document.querySelector('.mobile-toggle');
-        
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
-                sidebar.classList.remove('active');
-            }
-        }
-    });
+    backdrop.addEventListener('click', closeSidebar);
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && window.innerWidth <= 768) {
-            sidebar.classList.remove('active');
+            closeSidebar();
         }
+    });
+
+    // Close sidebar when clicking any sidebar link on mobile
+    sidebar.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        });
     });
 }
 

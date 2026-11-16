@@ -2,13 +2,13 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
         <div>
-            <h1 class="h3">Manage Teknisi</h1>
-            <p class="text-muted">Kelola akun teknisi untuk sistem servis komputer</p>
+            <h1 class="h3 mb-1">Manage Teknisi</h1>
+            <p class="text-muted mb-0">Kelola akun teknisi untuk sistem servis komputer</p>
         </div>
         <a href="{{ route('technicians.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Tambah Teknisi
+            <i class="fas fa-plus me-1"></i> Tambah Teknisi
         </a>
     </div>
 
@@ -63,7 +63,46 @@
             @endif
         </div>
         <div class="card-body p-0">
-            <div class="table-responsive">
+            @if($technicians->count() > 0)
+            {{-- 1. Mobile View: Detail Cards --}}
+            <div class="d-block d-md-none p-3 bg-light rounded-4">
+                @foreach($technicians as $technician)
+                    <article class="card border-0 shadow-sm rounded-4 mb-3 bg-white overflow-hidden">
+                        <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2.5">
+                                <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; font-size: 0.95rem;">
+                                    {{ strtoupper(substr($technician->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-0">{{ $technician->name }}</h6>
+                                    <small class="text-muted" style="font-size: 0.7rem;"><i class="far fa-calendar-alt me-1"></i>{{ $technician->created_at->format('d M Y') }}</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-light text-secondary border">ID: {{ $technician->id }}</span>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="mb-3">
+                                <span class="text-muted small d-block mb-1">Email Akun:</span>
+                                <span class="font-monospace text-secondary small">{{ $technician->email }}</span>
+                            </div>
+                            <div class="d-flex gap-2 pt-2 border-top">
+                                <a href="{{ route('technicians.show', $technician->id) }}" class="btn btn-sm btn-info text-white rounded-3 flex-fill text-center fw-semibold py-1.5">
+                                    <i class="fas fa-eye me-1"></i> Detail
+                                </a>
+                                <a href="{{ route('technicians.edit', $technician->id) }}" class="btn btn-sm btn-warning text-white rounded-3 px-3 py-1.5" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger rounded-3 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $technician->id }}" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+
+            {{-- 2. Desktop View: Table --}}
+            <div class="d-none d-md-block table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
@@ -75,7 +114,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($technicians as $technician)
+                        @foreach($technicians as $technician)
                         <tr>
                             <td>{{ $technician->id }}</td>
                             <td>{{ $technician->name }}</td>
@@ -93,51 +132,51 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
-                                
-                                <div class="modal fade" id="deleteModal{{ $technician->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $technician->id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel{{ $technician->id }}">Konfirmasi Hapus</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Apakah Anda yakin ingin menghapus teknisi <strong>{{ $technician->name }}</strong>?
-                                                <br><small class="text-muted">Tindakan ini tidak dapat dibatalkan.</small>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <form action="{{ route('technicians.destroy', $technician->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Hapus</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <div class="text-muted">
-                                    @if(request('search'))
-                                        <i class="fas fa-search fa-3x mb-3"></i>
-                                        <p class="mb-0">Tidak ada teknisi yang ditemukan</p>
-                                        <small>Coba gunakan kata kunci yang berbeda atau <a href="{{ route('technicians.index') }}">lihat semua teknisi</a></small>
-                                    @else
-                                        <i class="fas fa-users fa-3x mb-3"></i>
-                                        <p class="mb-0">Belum ada data teknisi</p>
-                                        <small>Klik tombol "Tambah Teknisi" untuk menambahkan teknisi baru</small>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
+
+            {{-- Modals container --}}
+            @foreach($technicians as $technician)
+                <div class="modal fade" id="deleteModal{{ $technician->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $technician->id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel{{ $technician->id }}">Konfirmasi Hapus</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Apakah Anda yakin ingin menghapus teknisi <strong>{{ $technician->name }}</strong>?
+                                <br><small class="text-muted">Tindakan ini tidak dapat dibatalkan.</small>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <form action="{{ route('technicians.destroy', $technician->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+            @else
+            <div class="text-center py-5 text-muted">
+                @if(request('search'))
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <p class="mb-0">Tidak ada teknisi yang ditemukan</p>
+                    <small>Coba gunakan kata kunci yang berbeda atau <a href="{{ route('technicians.index') }}">lihat semua teknisi</a></small>
+                @else
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <p class="mb-0">Belum ada data teknisi</p>
+                    <small>Klik tombol "Tambah Teknisi" untuk menambahkan teknisi baru</small>
+                @endif
+            </div>
+            @endif
         </div>
         @if($technicians->hasPages())
         <div class="card-footer bg-white py-3 d-flex justify-content-center">

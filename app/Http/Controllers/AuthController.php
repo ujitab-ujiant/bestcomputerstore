@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required'
         ]);
 
@@ -26,15 +26,28 @@ class AuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        $credentials = $request->only('email', 'password');
+        $loginInput = trim($request->input('email'));
+        $password = $request->input('password');
         $remember = $request->has('remember');
 
+        // Check if input is email or phone number
+        if (filter_var($loginInput, FILTER_VALIDATE_EMAIL)) {
+            $credentials = ['email' => $loginInput, 'password' => $password];
+        } else {
+            $normalizedPhone = \App\Models\Customer::normalizePhone($loginInput);
+            $credentials = ['phone' => $normalizedPhone, 'password' => $password];
+        }
+
         if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+            if ($user->role === 'pelanggan') {
+                return redirect('/customer/dashboard');
+            }
             return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Username atau password salah',
+            'email' => 'Email/No. Telepon atau password salah',
         ])->withInput($request->except('password'));
     }
 

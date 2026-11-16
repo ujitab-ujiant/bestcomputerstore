@@ -76,12 +76,41 @@ body {
 /* Mobile toggle button */
 .mobile-toggle {
     display: none;
-    background: none;
-    border: none;
-    color: #2d3748;
-    font-size: 1.5rem;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    margin-right: 1rem;
+    transition: all 0.2s ease;
+}
+
+.mobile-toggle:hover, .mobile-toggle:focus {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Sidebar Backdrop for Mobile */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 1040;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Custom modal styles */
@@ -119,6 +148,8 @@ body {
 @media (max-width: 768px) {
     .sidebar {
         transform: translateX(-100%);
+        z-index: 1050;
+        box-shadow: 0 0 25px rgba(0,0,0,0.4);
     }
     
     .sidebar.active {
@@ -127,9 +158,10 @@ body {
     
     .main-content {
         margin-left: 0;
+        padding: 1rem 0.75rem;
     }
     
     .mobile-toggle {
-        display: block;
+        display: inline-flex;
     }
 }

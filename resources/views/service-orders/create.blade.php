@@ -28,8 +28,11 @@
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="customer_phone" class="form-label">Nomor Telepon</label>
-                        <input type="text" class="form-control @error('customer_phone') is-invalid @enderror" id="customer_phone" name="customer_phone" value="{{ old('customer_phone') }}">
+                        <label for="customer_phone" class="form-label">Nomor Telepon / WhatsApp <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control @error('customer_phone') is-invalid @enderror" id="customer_phone" name="customer_phone" value="{{ old('customer_phone') }}" placeholder="Contoh: 08123456789 atau +628123456789" required>
+                        <small class="text-muted d-block mt-1">
+                            💡 Akun pelanggan akan dibuat otomatis. Login menggunakan nomor HP ini (Password default: 4 digit terakhir nomor HP).
+                        </small>
                         @error('customer_phone')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -123,8 +126,30 @@
                     </div>
                     @endif
                     
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Simpan Service Order</button>
+                    <div class="col-12 mb-3 mt-2">
+                        <h5>Kesepakatan Garansi Servis</h5>
+                        <hr>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="warranty_duration_days" class="form-label">Durasi Garansi (Hari)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control @error('warranty_duration_days') is-invalid @enderror" id="warranty_duration_days" name="warranty_duration_days" value="{{ old('warranty_duration_days', 30) }}" min="0" placeholder="Contoh: 30">
+                            <span class="input-group-text">Hari</span>
+                        </div>
+                        <small class="text-muted">Misal: 15 hari, 30 hari (1 bulan), 90 hari (3 bulan). Isi 0 jika tanpa garansi.</small>
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label for="warranty_note" class="form-label">Ketentuan Garansi yang Disepakati</label>
+                        <input type="text" class="form-control" id="warranty_note" name="warranty_note" value="{{ old('warranty_note', 'Garansi berlaku untuk sparepart dan jasa servis yang sama. Tidak mencakup kerusakan fisik, kelalaian, atau terkena cairan.') }}" placeholder="Catatan kesepakatan garansi">
+                        <small class="text-muted">Keterangan ini akan tercetak di nota fisik dan dapat dibaca oleh pelanggan di portal.</small>
+                    </div>
+                    
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+                            <i class="fas fa-save me-1"></i> Simpan Service Order
+                        </button>
                     </div>
                 </div>
             </form>

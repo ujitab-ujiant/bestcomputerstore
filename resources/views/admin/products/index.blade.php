@@ -11,14 +11,14 @@
     ];
 @endphp
 
-<div class="top-navbar d-flex justify-content-between align-items-center mb-4">
+<div class="top-navbar d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
     <div class="welcome-text">
-        <h1>Manajemen Produk</h1>
-        <p>Kelola katalog produk</p>
+        <h1 class="mb-1">Manajemen Produk</h1>
+        <p class="mb-0 text-muted">Kelola katalog produk</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2 w-100 w-sm-auto">
         <a href="{{ route('admin.products.create') }}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Tambah Produk Baru
+            <i class="fas fa-plus me-1"></i> Tambah Produk Baru
         </a>
         <div class="dropdown">
             <button class="btn btn-info text-white dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -247,9 +247,63 @@
         </div>
     </div>
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+        @if($products->count() > 0)
+        {{-- 1. Mobile View: Detail Cards --}}
+        <div class="d-block d-md-none p-3 bg-light rounded-4">
+            @foreach($products as $product)
+                <article class="card border-0 shadow-sm rounded-4 mb-3 bg-white overflow-hidden">
+                    <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
+                        <span class="badge bg-light text-secondary border small">{{ $categoryTranslations[$product->category] ?? $product->category }}</span>
+                        <div>
+                            @if($product->status == 'active')
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5 rounded-pill">Aktif</span>
+                            @else
+                                <span class="badge bg-secondary-subtle text-secondary px-2 py-0.5 rounded-pill">Nonaktif</span>
+                            @endif
+                            @if($product->featured)
+                                <span class="badge bg-warning text-dark px-2 py-0.5 rounded-pill ms-1">★ Unggulan</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex gap-3 align-items-start mb-2.5">
+                            <img src="{{ asset('img/products/' . $product->image) }}" 
+                                 alt="{{ $product->name }}" 
+                                 class="img-thumbnail rounded-3 flex-shrink-0" 
+                                 style="width: 70px; height: 70px; object-fit: contain;">
+                            <div class="min-w-0 flex-grow-1">
+                                <h6 class="fw-bold text-dark mb-1 text-truncate" title="{{ $product->name }}">{{ $product->name }}</h6>
+                                <div class="small text-muted mb-1">{{ $product->brand ?? '-' }}</div>
+                                <div>
+                                    @if($product->discounted_price)
+                                        <span class="text-decoration-line-through text-muted small">{{ $product->formatted_price }}</span>
+                                        <span class="fw-bold text-success ms-1">{{ $product->formatted_discounted_price }}</span>
+                                    @else
+                                        <span class="fw-bold text-success">{{ $product->formatted_price }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 pt-2 border-top">
+                            <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info text-white rounded-3 flex-fill text-center fw-semibold py-1.5">
+                                <i class="fas fa-eye me-1"></i> Detail
+                            </a>
+                            <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-sm btn-warning text-white rounded-3 px-3 py-1.5 fw-semibold" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger rounded-3 px-3 py-1.5" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $product->id }}" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            @endforeach
+        </div>
+
+        {{-- 2. Desktop View: Table --}}
+        <div class="d-none d-md-block table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
                     <tr>
                         <th>Gambar</th>
                         <th>Nama</th>
@@ -259,11 +313,11 @@
                         <th>Status</th>
                         <th>Unggulan</th>
                         <th>Tanggal Dibuat</th>
-                        <th>Aksi</th>
+                        <th class="text-end pe-3">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($products as $product)
+                    @foreach($products as $product)
                     <tr>
                         <td>
                             <img src="{{ asset('img/products/' . $product->image) }}" 
@@ -309,7 +363,7 @@
                         <td>
                             <small class="text-muted">{{ $product->created_at->format('d/m/Y') }}</small>
                         </td>
-                        <td>
+                        <td class="text-end pe-3">
                             <div class="btn-group">
                                 <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-sm btn-info text-white" title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
@@ -321,48 +375,49 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
-
-                            <div class="modal fade" id="deleteModal{{ $product->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $product->id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteModalLabel{{ $product->id }}">Konfirmasi Hapus</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Apakah Anda yakin ingin menghapus {{ $product->name }}?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Hapus</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </td>
                     </tr>
-                    @empty
-                    <tr>
-                        <td colspan="9" class="text-center py-3">
-                            @if(request()->hasAny(['search', 'category', 'brand', 'status', 'featured', 'date_from', 'date_to']))
-                                Tidak ada produk yang sesuai dengan kriteria pencarian.
-                                <br>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-outline-primary mt-2">
-                                    <i class="fas fa-refresh"></i> Reset Pencarian
-                                </a>
-                            @else
-                                Tidak ada produk ditemukan
-                            @endif
-                        </td>
-                    </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
+
+        {{-- Modals container --}}
+        @foreach($products as $product)
+            <div class="modal fade" id="deleteModal{{ $product->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $product->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel{{ $product->id }}">Konfirmasi Hapus</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Apakah Anda yakin ingin menghapus {{ $product->name }}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+        @else
+        <div class="text-center py-5 text-muted">
+            @if(request()->hasAny(['search', 'category', 'brand', 'status', 'featured', 'date_from', 'date_to']))
+                <p class="mb-2">Tidak ada produk yang sesuai dengan kriteria pencarian.</p>
+                <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-refresh"></i> Reset Pencarian
+                </a>
+            @else
+                <p class="mb-0">Tidak ada produk ditemukan</p>
+            @endif
+        </div>
+        @endif
     </div>
     <div class="card-footer bg-white py-3 d-flex justify-content-center">
         <div class="custom-pagination">
