@@ -30,19 +30,6 @@ menggunakan framework Laravel.
 Keaslian Project ini dapat dibuktikan dengan Laporan Kerja Praktik yang telah dibuat sebelumnya jika diminta
 ---
 
-## 👨‍💻 Developer & Kontribusi
-
-**TABAH UJIANTO**  
-NIM: 221011401810  
-Program Studi: Teknik Informatika
-Universitas Pamulang
-
-### Kontribusi:
-- Pengembangan lanjutan dari sistem awal
-- Perbaikan struktur kode dan database
-- Implementasi autentikasi & manajemen data
-- Penyesuaian UI/UX
-
 > Catatan:  
 > Project ini **bukan sistem produksi perusahaan** dan
 > digunakan **khusus untuk keperluan akademik**.
